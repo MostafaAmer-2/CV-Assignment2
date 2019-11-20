@@ -22,34 +22,28 @@ def perceptron():
     weights = configureInitialWeightMatrix()
     n = 1
 
-    #handling targets
-    startingTarget = 240 * 0  # 1*0, 1*1, 1*2....etc
-    target = np.full(2400, -1)
-    target[startingTarget:startingTarget + 240] = 1
 
-    for e in range(500):
-        for img in range(0, 2400):
-            currentImage = images[img]
-            if ((1 if (np.dot(currentImage, weights[0]) >= 0) else -1) != target[img]):
-                weights[0] = weights[0] + n * target[img] * currentImage
 
-    confusionMatrix_0 = np.zeros((10, 10))
-    correct = 0
-    false = 0
-    for i in range(1,201):
-        testImg = plt.imread('./Test/'+str(i)+'.jpg')
-        testImg = np.append(testImg.flatten(), 1)
-        testingResult = True if(np.dot(weights[0], testImg) >= 0) else False
+    confusionMatrix = np.zeros((10, 10))
+    for c in range(10):
 
-        if(testingResult):
-            correct = correct +1
-        else:
-            false = false + 1
+        # handling targets
+        startingTarget = 240 * c  # 1*0, 1*1, 1*2....etc
+        target = np.full(2400, -1)
+        target[startingTarget:startingTarget + 240] = 1
 
-        # confusionMatrix_0[((i-1)//20), testingResult] += 1
+        for e in range(500):
+            for img in range(0, 2400):
+                currentImage = images[img]
+                if ((1 if (np.dot(currentImage, weights[c]) >= 0) else -1) != target[img]):
+                    weights[c] = weights[c] + n * target[img] * currentImage
 
-    print("correct:" + str(correct))
-    print("false:" + str(false))
+        for i in range(1,201):
+            testImg = plt.imread('./Test/'+str(i)+'.jpg')
+            testImg = np.append(testImg.flatten(), 1)
+            confusionMatrix[c][((i-1)//20)] = confusionMatrix[c][((i-1)//20)]+1 if(np.dot(weights[c], testImg) >= 0) else confusionMatrix[c][((i-1)//20)]
+
+    print(confusionMatrix)
 
 
 
