@@ -65,8 +65,7 @@ def naive():
 
     return mews, standard_div
     
-def naive_test(filepath):
-    mews, standard_div = naive()
+def naive_test(filepath, mews, standard_div):
     img = plt.imread(filepath)
     img2 = img.flatten()
     img3 = np.append(img2, 1)
@@ -81,18 +80,33 @@ def naive_test(filepath):
             gaussian = gaussian_eq(img3[i], mews[c,i], std_div)
             probs[c] = probs[c]*gaussian
     
-    print(np.argmax(probs))
+    return np.argmax(probs)
 
     
 def gaussian_eq(n, mew, std_div):
     return 1/math.sqrt(2*math.pi*std_div)*math.exp(- ( pow(n - mew,2) ) / ( 2*std_div ) )
+
+def confusionMatrixGenerator(mews, std_div):
+    confusionMatrix= np.zeros((10, 10))
+    for i in range(1,201):
+        testingResult = naive_test('./Test/'+str(i)+'.jpg', mews, std_div)
+        confusionMatrix[((i-1)//20), testingResult] += 1
+
+    print(confusionMatrix)
+    plt.imshow(confusionMatrix)
+    plt.savefig("./Confusion-Gauss.jpg")
+    plt.show()
+
+    return confusionMatrix
 
 if __name__ == "__main__":
 
     # images = loadTrainingSet()
     # print(images[0, 10])
     # perceptron()
-    naive_test("./Test/142.jpg")
+    # naive_test("./Test/142.jpg")
+    mews, standard_div = naive()
+    confusionMatrixGenerator(mews, standard_div)
     # print(configureInitialWeightMatrix())
 
 
