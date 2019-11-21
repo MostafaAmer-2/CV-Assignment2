@@ -3,7 +3,7 @@ import math
 import matplotlib.pyplot as plt
 
 def loadTrainingSet():
-    images = np.empty([2400, 785], dtype=np.float64)
+    images = np.empty([2400, 785])
     for i in range(1, 2401):
         img = plt.imread('./Train/' + str(i) + '.jpg')
         img2 = img.flatten()
@@ -21,34 +21,36 @@ def configureInitialWeightMatrix():
 def perceptron():
     images = loadTrainingSet()
     weights = configureInitialWeightMatrix()
-    n = 1
+    learning_rates = np.array([1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000001, 0.00000001, 0.000000001])
 
-    confusionMatrix = np.zeros((10, 10))
-    for c in range(10):
-        print("Training Class " + str(c))
-        # handling targets
-        startingTarget = 240 * c  # 1*0, 1*1, 1*2....etc
-        target = np.full(2400, -1)
-        target[startingTarget:startingTarget + 240] = 1
+    for n in learning_rates:
+        confusionMatrix = np.zeros((10, 10))
+        for c in range(10):
+            print("Training Class " + str(c))
+            # handling targets
+            startingTarget = 240 * c  # 1*0, 1*1, 1*2....etc
+            target = np.full(2400, -1)
+            target[startingTarget:startingTarget + 240] = 1
 
-        for epoch in range(500):
-            for img in range(0, 2400):
-                currentImage = images[img]
-                if ((1 if (np.dot(weights[c], currentImage) >= 0) else -1) != target[img]):
-                    weights[c] = weights[c] + n * currentImage * target[img]
+            for epoch in range(500):
+                for img in range(0, 2400):
+                    currentImage = images[img]
+                    if ((1 if (np.dot(weights[c], currentImage) >= 0) else -1) != target[img]):
+                        weights[c] = weights[c] + n * currentImage * target[img]
 
-    for i in range(1, 201):
-        testImg = plt.imread('./Test/' + str(i) + '.jpg')
-        testImg = np.append(testImg.flatten(), 1)
-        dot = np.dot(weights, testImg)
-        index = np.argmax(dot)
-        confusionMatrix[((i - 1) // 20)][index] = confusionMatrix[((i - 1) // 20)][index] + 1
+        for i in range(1, 201):
+            testImg = plt.imread('./Test/' + str(i) + '.jpg')
+            testImg = np.append(testImg.flatten(), 1)
+            dot = np.dot(weights, testImg)
+            index = np.argmax(dot)
+            confusionMatrix[((i - 1) // 20)][index] = confusionMatrix[((i - 1) // 20)][index] + 1
 
-
-    print(confusionMatrix)
-    # plt.imshow(confusionMatrix)
-    # plt.savefig("./Confusion-0.jpg")
-    # plt.show()
+        position_n, = np.where(learning_rates == n)
+        print("Confusion Matrix - " + str(position_n[0]))
+        print(confusionMatrix)
+        plt.imshow(confusionMatrix)
+        plt.savefig("./Confusion-"+str(position_n[0]) +".jpg")
+        # plt.show()
 
 def naive():
     images = loadTrainingSet()
@@ -105,13 +107,12 @@ def confusionMatrixGenerator(mews, std_div):
 
 if __name__ == "__main__":
 
-    # images = loadTrainingSet()
-    # print(images[0, 10])
-    # perceptron()
-    # naive_test("./Test/142.jpg")
-    mews, standard_div = naive()
-    confusionMatrixGenerator(mews, standard_div)
-    # print(configureInitialWeightMatrix())
+    # Question 1
+    perceptron()
+
+    # Question 2
+    # mews, standard_div = naive()
+    # confusionMatrixGenerator(mews, standard_div)
 
     weight = [1, 2, 1]
     weight = np.array(weight)
