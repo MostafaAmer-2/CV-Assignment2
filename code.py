@@ -20,10 +20,10 @@ def configureInitialWeightMatrix():
 
 def perceptron():
     images = loadTrainingSet()
-    weights = configureInitialWeightMatrix()
-    learning_rates = np.array([1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000001, 0.00000001, 0.000000001])
+    learning_rates = np.array([1.0, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000001, 0.00000001, 0.000000001])
 
     for n in learning_rates:
+        weights = configureInitialWeightMatrix()
         confusionMatrix = np.zeros((10, 10))
         for c in range(10):
             print("Training Class " + str(c))
@@ -35,8 +35,10 @@ def perceptron():
             for epoch in range(500):
                 for img in range(0, 2400):
                     currentImage = images[img]
-                    if ((1 if (np.dot(weights[c], currentImage) >= 0) else -1) != target[img]):
-                        weights[c] = weights[c] + n * currentImage * target[img]
+                    currentTarget = target[img]
+                    calculatedTarget = 1 if (np.dot(weights[c], currentImage) >= 0) else -1
+                    if (calculatedTarget != currentTarget):
+                        weights[c] = weights[c] + (n * currentImage * currentTarget)
 
         for i in range(1, 201):
             testImg = plt.imread('./Test/' + str(i) + '.jpg')
